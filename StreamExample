@@ -1,0 +1,87 @@
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+public class StreamExample {
+
+	public static void main(String[] args) {
+		var list=Arrays.asList("code","decode","code","random");
+		var set=new HashSet<>();
+	    
+		//UniqueValues
+		list.stream().collect(Collectors.toSet()).forEach(n->System.out.println(n));
+		
+		//DuplicateValues
+		list.stream().filter(n->!set.add(n)).collect(Collectors.toSet()).forEach(n->System.out.println(n));
+		
+		//groupingby and count repeated>
+		 var count = list.stream().collect(Collectors.groupingBy(n->n,Collectors.counting()));
+		System.out.println(count);
+		
+		//groupby duplicate values
+		var dup=count.entrySet().stream().filter(n->n.getValue()>1).collect(Collectors.toList());
+			System.out.println(dup);
+			
+		//groupby duplicate values names only
+		var namesonly=count.entrySet().stream().filter(n->n.getValue()>1).map(n->n.getKey()).collect(Collectors.toList());
+			System.out.println(namesonly);		
+			
+			employeeDataStream();
+	}
+
+	public static void employeeDataStream() {
+		System.out.println("Employee data stream activity");
+		var empList=new ArrayList<Employee>();
+		empList.add(new Employee("prag", 1,30));
+		empList.add(new Employee("pras", 2,35));
+		empList.add(new Employee("pooj", 5,29));
+		empList.add(new Employee("ard", 9,39));
+		empList.add(new Employee("prag", 6,40));
+		
+		//sort based on the id ascending
+		System.out.println("sort based on the id ascending");
+		empList.stream().map(n->n.id).
+		sorted().forEach(n->System.out.println(n));
+		
+		
+		//sort based on the id descending
+		System.out.println("sort based on the id descending");
+		empList.stream().filter(n->n.getAge()>30).map(n->n.getId()).sorted((o1,o2)->(o2-o1))
+		.collect(Collectors.toList()).forEach(n->System.out.println(n));
+		
+		//top 3 empluyee highest
+		System.out.println("/top 3 empluyee highest \n");
+		empList.stream().map(n->n.getId()).sorted((o1,o2)->(o2-o1)).limit(3)
+		.collect(Collectors.toList()).forEach(n->System.out.println(n));
+	
+		
+		//top 3 empluyee lowest
+		System.out.println("/top 3 empluyee lowest \n");
+		empList.stream().map(n->n.getId()).limit(3).forEach(n->System.out.println(n));;
+		
+		//max,min ,sum ,average by summaryStatistics id value
+		System.out.println("/max id value");
+		System.out.println(empList.stream().mapToInt(n->n.id).summaryStatistics().getMax());
+		
+		//2nd 3rd lowest id
+		System.out.println("2nd 3rd lowest id");
+		empList.stream().map(n->n.getId()).sorted().skip(1).limit(2).collect(Collectors.toList()).forEach(n->System.out.println(n));
+		
+	//convert string uppercase jpoin in coma
+		var emp=empList.stream().map(n->n.getName().toUpperCase()).collect(Collectors.joining(",  "));
+		System.out.println(emp);
+		
+		//age below group by sorted
+		var emp1=empList.stream().collect(Collectors.groupingBy(n->n.getAge(),TreeMap::new,Collectors.toSet()));//wrong output
+		
+		System.out.println(emp1);
+		
+		
+	}
+}
